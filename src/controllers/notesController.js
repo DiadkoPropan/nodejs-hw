@@ -11,21 +11,21 @@ export const getAllNotes = async (req, res) => {
     return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   }
 
-  const filter = {userId: req.user._id};
+  const notesQuery = Note.find({ userId: req.user._id });
 
   if (search && search.trim() !== "") {
     const safeSearch = escapeRegex(search.trim());
     const regex = new RegExp(safeSearch, "i");
-    filter.$or = [{ title: regex }, { content: regex }];
+    notesQuery.or([{ title: regex }, { content: regex }]);
   }
 
   if (tag) {
-    filter.tag = tag;
+    notesQuery.where('tag').equals(tag);
   }
 
   const [totalNotes, notes] = await Promise.all([
-    Note.countDocuments(filter),
-    Note.find(filter).skip(skip).limit(Number(perPage))
+    notesQuery.clone().countDocuments(),
+    notesQuery.skip(skip).limit(perPage),
   ]);
 
   const totalPages = Math.ceil(totalNotes / perPage);
