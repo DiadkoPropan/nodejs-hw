@@ -2,16 +2,14 @@ import createHttpError from 'http-errors';
 import { Note } from '../models/note.js';
 
 export const getAllNotes = async (req, res) => {
-
   const { page = 1, perPage = 10, tag, search } = req.query;
-
   const skip = (page - 1) * perPage;
 
   function escapeRegex(string) {
     return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   }
 
-  const filter = {userId: req.user._id};
+  const filter = { userId: req.user._id };
 
   if (search && search.trim() !== "") {
     const safeSearch = escapeRegex(search.trim());
@@ -25,17 +23,20 @@ export const getAllNotes = async (req, res) => {
 
   const [totalNotes, notes] = await Promise.all([
     Note.countDocuments(filter),
-    Note.find(filter).skip(skip).limit(Number(perPage))
+    Note.find(filter).skip(skip).limit(Number(perPage)),
   ]);
 
   const totalPages = Math.ceil(totalNotes / perPage);
 
-    res.status(200).json({
-      page,
-      perPage,
+  res.status(200).json({
+    message: "Notes fetched successfully",
+    data: {
+      page: Number(page),
+      perPage: Number(perPage),
       totalNotes,
       totalPages,
       notes,
+    },
   });
 };
 
@@ -48,11 +49,13 @@ export const getNoteById = async (req, res, next) => {
   });
 
   if (!note) {
-    next(createHttpError(404, 'Note not found'));
-    return;
+    return next(createHttpError(404, "Note not found"));
   }
 
-  res.status(200).json(note);
+  res.status(200).json({
+    message: "Note fetched successfully",
+    data: note,
+  });
 };
 
 export const createNote = async (req, res) => {
@@ -60,22 +63,29 @@ export const createNote = async (req, res) => {
     ...req.body,
     userId: req.user._id,
   });
-  res.status(201).json(note);
+
+  res.status(201).json({
+    message: "Note created successfully",
+    data: note,
+  });
 };
 
 export const deleteNote = async (req, res, next) => {
   const { noteId } = req.params;
+
   const note = await Note.findOneAndDelete({
     _id: noteId,
     userId: req.user._id,
   });
 
   if (!note) {
-    next(createHttpError(404, "Note not found"));
-    return;
+    return next(createHttpError(404, "Note not found"));
   }
 
-  res.status(200).send(note);
+  res.status(200).json({
+    message: "Note deleted successfully",
+    data: note,
+  });
 };
 
 export const updateNote = async (req, res, next) => {
@@ -88,9 +98,11 @@ export const updateNote = async (req, res, next) => {
   );
 
   if (!note) {
-    next(createHttpError(404, 'Note not found'));
-    return;
+    return next(createHttpError(404, "Note not found"));
   }
 
-  res.status(200).json(note);
+  res.status(200).json({
+    message: "Note updated successfully",
+    data: note,
+  });
 };
