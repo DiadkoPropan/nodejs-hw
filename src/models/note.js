@@ -6,24 +6,19 @@ const noteSchema = new Schema(
   {
     title: {
       type: String,
-      trim: true,
       required: true,
+      trim: true,
     },
     content: {
       type: String,
-      trim: true,
       required: false,
+      trim: true,
       default: '',
     },
     tag: {
       type: String,
       enum: [...TAGS],
       default: 'Todo',
-    },
-    userId: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
     },
   },
   {
@@ -32,5 +27,7 @@ const noteSchema = new Schema(
   },
 
 );
+
+noteSchema.index({ title: 'text', content: 'text' });
 
 export const Note = model('Note', noteSchema);
