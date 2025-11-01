@@ -7,12 +7,15 @@ export const getAllNotesSchema = {
     page: Joi.number().integer().min(1).default(1),
     perPage: Joi.number().integer().min(5).max(20).default(10),
     tag: Joi.string().valid(...TAGS),
-    search: Joi.string().allow("")
+    search: Joi.string().allow(""),
   }),
 };
 
 const objectIdValidator = (value, helpers) => {
-  return !isValidObjectId(value) ? helpers.message('Invalid id format') : value;
+  if (!isValidObjectId(value)) {
+    return helpers.message("Invalid id format");
+  }
+  return value;
 };
 
 export const noteIdSchema = {
@@ -25,7 +28,7 @@ export const createNoteSchema = {
   [Segments.BODY]: Joi.object({
     title: Joi.string().min(1).required(),
     content: Joi.string().allow(""),
-    tag: tags: Joi.array().items(Joi.string().valid(...TAGS)).optional()
+    tag: Joi.string().valid(...TAGS).optional(), // ✅ один тег, не масив
   }),
 };
 
@@ -36,6 +39,6 @@ export const updateNoteSchema = {
   [Segments.BODY]: Joi.object({
     title: Joi.string().min(1),
     content: Joi.string().allow(""),
-    tag: tags: Joi.array().items(Joi.string().valid(...TAGS)).optional()
-  }).min(1)
+    tag: Joi.string().valid(...TAGS).optional(),
+  }).min(1),
 };
