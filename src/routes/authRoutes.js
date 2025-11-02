@@ -1,5 +1,19 @@
-import { loginUserSchema, registerUserSchema, requestResetEmailSchema, resetPasswordSchema } from '../validations/authValidation.js';
-import { loginUser, logoutUser, refreshUserSession, registerUser, requestResetEmail, resetPassword } from '../controllers/authController.js';
+import {
+  loginUserSchema,
+  registerUserSchema,
+  requestResetEmailSchema,
+  resetPasswordSchema,
+} from '../validations/authValidation.js';
+
+import {
+  loginUser,
+  logoutUser,
+  refreshUserSession,
+  registerUser,
+  requestResetEmail,
+  resetPassword,
+} from '../controllers/authController.js';
+
 import { celebrate } from 'celebrate';
 import { Router } from 'express';
 
