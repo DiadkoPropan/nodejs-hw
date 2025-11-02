@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import 'dotenv/config';
+import pinoHttp from 'pino-http';
 import { errors } from 'celebrate';
 
 import { notFoundHandler } from './middleware/notFoundHandler.js';
@@ -9,6 +10,14 @@ import notesRoutes from './routes/notesRoutes.js';
 
 const app = express();
 const PORT = process.env.PORT ?? 3030;
+
+const logger = pinoHttp({
+  transport: {
+    target: 'pino-pretty',
+    options: { colorize: true },
+  },
+});
+app.use(logger);
 
 app.use(cors());
 app.use(express.json());
